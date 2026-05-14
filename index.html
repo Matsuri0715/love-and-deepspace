@@ -3,21 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深空獵人終端 | 攻略紀錄站</title>
+    <title>深空獵人終端 | 混沌深網數據站</title>
     <style>
-        /* --- 核心視覺設定 (設計系美化區) --- */
         :root {
             --bg-color: #0b0e14;
             --card-bg: #161b22;
             --text-main: #e6edf3;
             --accent-cyan: #00f2ff;
-            /* 角色代表色 */
-            --color-xavier: #87ceeb; /* 沈星回-天藍 */
-            --color-zayne: #a0d8de;  /* 黎深-青 */
-            --color-rafayel: #c3a6ff; /* 祁煜-紫 */
-            --color-sylus: #ff4d4d;   /* 秦徹-紅 */
-            --color-caleb: #ffcc99;  /* 夏以晝-橘 */
-            --color-mc: #c9d1d9;      /* 主控-灰 */
+            --color-xavier: #87ceeb; --color-zayne: #a0d8de;
+            --color-rafayel: #c3a6ff; --color-sylus: #ff4d4d; --color-caleb: #ffcc99;
         }
 
         body {
@@ -27,10 +21,10 @@
             color: var(--text-main);
             display: flex;
             height: 100vh;
-            overflow: hidden;
+            flex-direction: row; /* 桌面版橫向排列 */
         }
 
-        /* --- 側邊導覽列 --- */
+        /* --- 側邊欄響應式設定 --- */
         .sidebar {
             width: 250px;
             background: #010409;
@@ -38,448 +32,392 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
+            flex-shrink: 0;
         }
 
-        .brand {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent-cyan);
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px var(--accent-cyan);
-        }
-
+        .brand { font-size: 1.2rem; font-weight: bold; color: var(--accent-cyan); margin-bottom: 30px; text-shadow: 0 0 10px var(--accent-cyan); }
         .nav-group { margin-bottom: 20px; }
         .nav-title { font-size: 0.8rem; color: #8b949e; text-transform: uppercase; margin-bottom: 10px; }
-        .nav-item { 
-            padding: 10px; cursor: pointer; border-radius: 6px; transition: 0.3s; 
-            margin-bottom: 5px;
-        }
-        .nav-item:hover { background: #1f242c; color: var(--accent-cyan); }
+        .nav-item { padding: 10px; cursor: pointer; border-radius: 6px; transition: 0.3s; margin-bottom: 5px; }
         .nav-item.active { background: #23863622; color: #3fb950; border-left: 3px solid #3fb950; }
 
-        /* --- 主要內容區 --- */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+
+        /* --- 手機版佈局調整 (螢幕小於 768px) --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; } /* 手機版改為直向排列 */
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #30363d;
+                padding: 15px;
+                box-sizing: border-box;
+            }
+            .brand { margin-bottom: 10px; text-align: center; }
+            .nav-group { display: none; } /* 手機版隱藏非必要選單 */
         }
 
-        /* 角色篩選器 */
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+        /* 進度統計區 */
+        .progress-section { background: var(--card-bg); padding: 15px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
+        .stats-text { font-size: 1rem; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        #percent-text { color: var(--accent-cyan); }
+        .progress-bar-bg { background: #30363d; height: 10px; border-radius: 5px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #00f2ff, #3fb950); height: 100%; width: 0%; transition: width 0.6s ease; }
 
-        .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid #30363d;
-            background: var(--card-bg);
-            color: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        /* 篩選群組 */
+        .filter-group { background: #0d1117; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #21262d; }
+        .filter-label { font-size: 0.8rem; color: #8b949e; margin-bottom: 10px; display: block; }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .filter-btn { padding: 6px 14px; border: 1px solid #30363d; background: var(--card-bg); color: white; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .filter-btn.active { background: var(--accent-cyan); color: #000; font-weight: bold; border-color: var(--accent-cyan); }
+        .filter-btn.active.xavier { background: var(--color-xavier); }
+        .filter-btn.active.zayne { background: var(--color-zayne); }
+        .filter-btn.active.rafayel { background: var(--color-rafayel); }
+        .filter-btn.active.sylus { background: var(--color-sylus); }
+        .filter-btn.active.caleb { background: var(--color-caleb); }
 
-        .filter-btn.active.xavier { background: var(--color-xavier); color: #000; }
-        .filter-btn.active.zayne { background: var(--color-zayne); color: #000; }
-        .filter-btn.active.rafayel { background: var(--color-rafayel); color: #000; }
-        .filter-btn.active.sylus { background: var(--color-sylus); color: #000; }
-        .filter-btn.active.caleb { background: var(--color-caleb); color: #000; }
-
-        /* --- 新增：進度條樣式 --- */
-        .progress-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #30363d;
-            margin-bottom: 25px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-        }
-
-        .stats-text {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        #percent-text { color: var(--accent-cyan); text-shadow: 0 0 5px var(--accent-cyan); }
-
-        .progress-bar-bg {
-            background: #30363d;
-            height: 12px;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid #000;
-        }
-
-        .progress-fill {
-            background: linear-gradient(90deg, #00f2ff, #3fb950);
-            height: 100%;
-            width: 0%;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-        }
-
-        /* 卡片佈局 */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .event-card {
-            background: var(--card-bg);
-            border: 1px solid #30363d;
-            border-radius: 10px;
-            padding: 15px;
-            transition: 0.3s;
-        }
-
-        .event-card:hover { border-color: var(--accent-cyan); transform: translateY(-3px); }
-        
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            font-size: 11px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        .type-crisis { background: #ff4d4d33; color: #ff4d4d; border: 1px solid #ff4d4d; }
-        .type-encounter { background: #00f2ff33; color: #00f2ff; border: 1px solid #00f2ff; }
-
-        .item-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
-        .item-status { font-size: 0.9rem; color: #8b949e; margin-bottom: 10px; }
+        /* 卡片設計 */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .event-card { background: var(--card-bg); border: 1px solid #30363d; border-radius: 8px; padding: 15px; transition: 0.3s; }
+        .badge { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 4px; margin-bottom: 10px; }
+        .type-crisis { background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d; }
+        .type-encounter { background: #00f2ff22; color: #00f2ff; border: 1px solid #00f2ff; }
+        .chap-tag { font-size: 0.75rem; color: #8b949e; margin-bottom: 5px; display: block; }
+        .item-name { font-size: 1rem; font-weight: bold; margin-bottom: 10px; }
+        label { cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <div class="brand">DEEPSPACE_TERMINAL v1.0</div>
-        <div class="nav-group">
-            <div class="nav-title">系統</div>
-            <div class="nav-item" onclick="showPage('home')">首頁概覽</div>
-        </div>
+        <div class="brand">HUNTER_DATA</div>
         <div class="nav-group">
             <div class="nav-title">混沌深網</div>
-            <div class="nav-item active" id="nav-tumeng" onclick="showPage('tumeng')">尋找圖蒙</div>
-            <div class="nav-item" id="nav-farewell" onclick="showPage('farewell')">最後的告別</div>
-            <div class="nav-item" id="nav-codes" onclick="showPage('codes')">代碼圖鑑</div>
-        </div>
-        <div class="nav-group">
-            <div class="nav-title">靈空行動</div>
-            <div class="nav-item">結局推演</div>
-            <div class="nav-item">偶發事件</div>
+            <div class="nav-item active">偶發相遇檔案庫</div>
         </div>
     </nav>
 
     <main class="main-content">
-        <h1 id="page-title">尋找圖蒙 - 偶發事件</h1>
+        <h1 style="font-size: 1.5rem;">混沌深網數據紀錄</h1>
 
-        <!-- 進度統計區 -->
         <div class="progress-section">
             <div class="stats-text">
-                <div>收集進度：<span id="completed-count">0</span> / <span id="total-count">0</span></div>
+                <div>進度：<span id="completed-count">0</span> / <span id="total-count">0</span></div>
                 <div id="percent-text">0%</div>
             </div>
-            <div class="progress-bar-bg">
-                <div id="progress-fill" class="progress-fill"></div>
+            <div class="progress-bar-bg"><div id="progress-fill" class="progress-fill"></div></div>
+        </div>
+
+        <div class="filter-group">
+            <span class="filter-label">1. 選擇獵人夥伴：</span>
+            <div class="filter-bar" id="char-filter-bar">
+                <button class="filter-btn active" onclick="setChar('All', this)">全部</button>
+                <button class="filter-btn xavier" onclick="setChar('Xavier', this)">沈星回</button>
+                <button class="filter-btn zayne" onclick="setChar('Zayne', this)">黎深</button>
+                <button class="filter-btn rafayel" onclick="setChar('Rafayel', this)">祁煜</button>
+                <button class="filter-btn sylus" onclick="setChar('Sylus', this)">秦徹</button>
+                <button class="filter-btn caleb" onclick="setChar('Caleb', this)">夏以晝</button>
+            </div>
+            <span class="filter-label">2. 篩選章節區域：</span>
+            <div class="filter-bar" id="chap-filter-bar">
+                <button class="filter-btn active" onclick="setChap('All', this)">全部顯示</button>
+                <button class="filter-btn" onclick="setChap('tumeng', this)">尋找圖蒙</button>
+                <button class="filter-btn" onclick="setChap('farewell', this)">最後的告別</button>
             </div>
         </div>
 
-        <div class="filter-bar">
-            <button class="filter-btn xavier" onclick="filterByChar('Xavier', this)">沈星回</button>
-            <button class="filter-btn zayne" onclick="filterByChar('Zayne', this)">黎深</button>
-            <button class="filter-btn rafayel" onclick="filterByChar('Rafayel', this)">祁煜</button>
-            <button class="filter-btn sylus" onclick="filterByChar('Sylus', this)">秦徹</button>
-            <button class="filter-btn caleb" onclick="filterByChar('Caleb', this)">夏以晝</button>
-            <button class="filter-btn mc" onclick="filterByChar('MC', this)">主控</button>
-            <button class="filter-btn active" id="btn-all" onclick="filterByChar('All', this)">顯示全部</button>
-        </div>
         <div id="card-container" class="grid-container"></div>
     </main>
 
     <script>
-        let currentCategory = 'tumeng';
+        let currentChar = 'All';
+        let currentChap = 'All';
 
-        const gameData = {
-    // 混沌深網：尋找圖蒙
-    tumeng: [
-        /* 沈星回 Xavier */
-        { id: "tx1", name: "正道之光－１", char: "Xavier", type: "encounter", status: true },
-        { id: "tx2", name: "正道之光－２", char: "Xavier", type: "encounter", status: true },
-        { id: "tx3", name: "玩偶演員－１", char: "Xavier", type: "encounter", status: true },
-        { id: "tx4", name: "玩偶演員－２", char: "Xavier", type: "encounter", status: true },
-        { id: "tx5", name: "散場之後", char: "Xavier", type: "encounter", status: false },
-        { id: "tx6", name: "高樹墜物", char: "Xavier", type: "encounter", status: true },
-        { id: "tx7", name: "卡牌王新手賽", char: "Xavier", type: "encounter", status: true },
-        { id: "tx8", name: "數據亂流", char: "Xavier", type: "encounter", status: true },
-        { id: "tx9", name: "迷宮驚魂", char: "Xavier", type: "encounter", status: true },
-        { id: "tx10", name: "開箱商人", char: "Xavier", type: "encounter", status: false },
-        { id: "tx11", name: "賣花婆婆", char: "Xavier", type: "encounter", status: false },
-        { id: "tx12", name: "嚮往自由", char: "Xavier", type: "encounter", status: false },
-        { id: "tx13", name: "吉祥橘貓", char: "Xavier", type: "encounter", status: false },
-        { id: "tx14", name: "中場無休", char: "Xavier", type: "encounter", status: true },
-        { id: "tx15", name: "情報售貨機", char: "Xavier", type: "encounter", status: false },
-        { id: "tx16", name: "神秘郵件", char: "Xavier", type: "encounter", status: true },
-        { id: "tx17", name: "心意無價", char: "Xavier", type: "encounter", status: true },
-        { id: "tx18", name: "雨中抉擇", char: "Xavier", type: "encounter", status: false },
-        { id: "tx19", name: "落跑塗鴉", char: "Xavier", type: "encounter", status: true },
-        { id: "tx20", name: "破壁之行", char: "Xavier", type: "encounter", status: false },
-        { id: "tx21", name: "咖啡甜酒", char: "Xavier", type: "encounter", status: false },
+        // 完整資料庫 (230+ 筆)
+        const gameData = [
+            // 沈星回 Xavier
+            { id: "tx1", name: "正道之光－１", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx2", name: "正道之光－２", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx3", name: "玩偶演員－１", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx4", name: "玩偶演員－２", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx5", name: "散場之後", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx6", name: "高樹墜物", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx7", name: "卡牌王新手賽", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx8", name: "數據亂流", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx9", name: "迷宮驚魂", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx10", name: "開箱商人", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx11", name: "賣花婆婆", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx12", name: "嚮往自由", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx13", name: "吉祥橘貓", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx14", name: "中場無休", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx15", name: "情報售貨機", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx16", name: "神秘郵件", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx17", name: "心意無價", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx18", name: "雨中抉擇", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx19", name: "落跑塗鴉", char: "Xavier", chap: "tumeng", type: "encounter", status: true },
+            { id: "tx20", name: "破壁之行", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "tx21", name: "咖啡甜酒", char: "Xavier", chap: "tumeng", type: "encounter", status: false },
+            { id: "fx1", name: "➊ 老電影－１", char: "Xavier", chap: "farewell", type: "crisis", status: true },
+            { id: "fx2", name: "➋ 老電影－２", char: "Xavier", chap: "farewell", type: "crisis", status: true },
+            { id: "fx3", name: "➊ 老舊販賣機－１", char: "Xavier", chap: "farewell", type: "crisis", status: true },
+            { id: "fx4", name: "➋ 老舊販賣機－２", char: "Xavier", chap: "farewell", type: "crisis", status: true },
+            { id: "fx5", name: "➊ 自助購物－１", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx6", name: "➋ 自助購物－２", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx7", name: "要錢不要命", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx8", name: "垃圾分類", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx9", name: "故障機器人", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx10", name: "ＭＰ３", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx11", name: "塔羅牌扮演", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx12", name: "神秘郵件 2.0", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx13", name: "敬相遇", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx14", name: "黯然的燈光", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx15", name: "畫家園模擬器", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx16", name: "紙箱演奏家", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx17", name: "閃耀燈球", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx18", name: "開業大酬賓", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx19", name: "進退兩難", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx20", name: "暗道往事", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx21", name: "異變", char: "Xavier", chap: "farewell", type: "crisis", status: true },
+            { id: "fx22", name: "療養機器人", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx23", name: "電子路障", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx24", name: "受傷的研究員", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx25", name: "牆壁中的＂神靈＂", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx26", name: "許願池的＂神靈＂", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx27", name: "倖存者", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx28", name: "意外社交", char: "Xavier", chap: "farewell", type: "encounter", status: true },
+            { id: "fx29", name: "被遺棄的置物箱", char: "Xavier", chap: "farewell", type: "encounter", status: true },
 
-        /* 黎深 Zayne */
-        { id: "tz1", name: "灼熱危機－１", char: "Zayne", type: "encounter", status: true },
-        { id: "tz2", name: "灼熱危機－２", char: "Zayne", type: "encounter", status: true },
-        { id: "tz3", name: "特別紀錄片－１", char: "Zayne", type: "encounter", status: true },
-        { id: "tz4", name: "特別紀錄片－２", char: "Zayne", type: "encounter", status: true },
-        { id: "tz5", name: "古樹有靈－１", char: "Zayne", type: "encounter", status: true },
-        { id: "tz6", name: "古樹有靈－２", char: "Zayne", type: "encounter", status: true },
-        { id: "tz7", name: "幸運者遊戲", char: "Zayne", type: "encounter", status: true },
-        { id: "tz8", name: "破碎鏡片", char: "Zayne", type: "encounter", status: true },
-        { id: "tz9", name: "路人改造", char: "Zayne", type: "encounter", status: true },
-        { id: "tz10", name: "逃脫醫院", char: "Zayne", type: "encounter", status: true },
-        { id: "tz11", name: "若是烏龜", char: "Zayne", type: "encounter", status: true },
-        { id: "tz12", name: "街邊棋局", char: "Zayne", type: "encounter", status: true },
-        { id: "tz13", name: "天降好運", char: "Zayne", type: "encounter", status: true },
-        { id: "tz14", name: "閒時放鬆", char: "Zayne", type: "encounter", status: true },
-        { id: "tz15", name: "情報售貨機", char: "Zayne", type: "encounter", status: true },
-        { id: "tz16", name: "神秘郵件", char: "Zayne", type: "encounter", status: true },
-        { id: "tz17", name: "心意無價", char: "Zayne", type: "encounter", status: true },
-        { id: "tz18", name: "雨中抉擇", char: "Zayne", type: "encounter", status: true },
-        { id: "tz19", name: "落跑塗鴉", char: "Zayne", type: "encounter", status: true },
-        { id: "tz20", name: "破壁之行", char: "Zayne", type: "encounter", status: true },
-        { id: "tz21", name: "咖啡甜酒", char: "Zayne", type: "encounter", status: true },
+            // 黎深 Zayne
+            { id: "tz1", name: "灼熱危機－１", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz2", name: "灼熱危機－２", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz3", name: "特別紀錄片－１", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz4", name: "特別紀錄片－２", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz5", name: "古樹有靈－１", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz6", name: "古樹有靈－２", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz7", name: "幸運者遊戲", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz8", name: "破碎鏡片", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz9", name: "路人改造", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz10", name: "逃脫醫院", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz11", name: "若是烏龜", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz12", name: "街邊棋局", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz13", name: "天降好運", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz14", name: "閒時放鬆", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz15", name: "情報售貨機", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz16", name: "神秘郵件", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz17", name: "心意無價", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz18", name: "雨中抉訝", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz19", name: "落跑塗鴉", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz20", name: "破壁之行", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "tz21", name: "咖啡甜酒", char: "Zayne", chap: "tumeng", type: "encounter", status: true },
+            { id: "fz1", name: "➊ 命運迴響－１", char: "Zayne", chap: "farewell", type: "crisis", status: true },
+            { id: "fz2", name: "➋ 命運迴響－２", char: "Zayne", chap: "farewell", type: "crisis", status: true },
+            { id: "fz3", name: "➊ 老舊販賣機－１", char: "Zayne", chap: "farewell", type: "crisis", status: true },
+            { id: "fz4", name: "➋ 老舊販賣機－２", char: "Zayne", chap: "farewell", type: "crisis", status: true },
+            { id: "fz5", name: "➊ 自助購物－１", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz6", name: "➋ 自助購物－２", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz7", name: "要錢不要命", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz8", name: "垃圾分類", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz9", name: "故障機器人", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz10", name: "集換零食包", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz11", name: "塔羅牌扮演", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz12", name: "神秘郵件 2.0", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz13", name: "敬相遇", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz14", name: "雪落時靠近", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz15", name: "獨家甜品站", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz16", name: "紙箱演奏家", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz17", name: "閃耀燈球", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz18", name: "開業大酬賓", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz19", name: "進退兩難", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz20", name: "暗道往事", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz21", name: "異變", char: "Zayne", chap: "farewell", type: "crisis", status: true },
+            { id: "fz22", name: "療養機器人", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz23", name: "電子路障", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz24", name: "受傷的研究員", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz25", name: "牆壁中的＂神靈＂", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz26", name: "許願池的＂神靈＂", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz27", name: "倖存者", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz28", name: "意外社交", char: "Zayne", chap: "farewell", type: "encounter", status: true },
+            { id: "fz29", name: "被遺棄的置物箱", char: "Zayne", chap: "farewell", type: "encounter", status: true },
 
-        /* 祁煜 Rafayel */
-        { id: "tr1", name: "閃耀噴泉－１", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr2", name: "閃耀噴泉－２", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr3", name: "愛與戲－１", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr4", name: "愛與戲－２", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr5", name: "奇怪攤販－１", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr6", name: "奇怪攤販－２", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr7", name: "良石難尋", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr8", name: "香氣襲人", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr9", name: "路遇推銷", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr10", name: "逃離城堡", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr11", name: "黑暗料理", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr12", name: "絕版周邊", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr13", name: "小鳥的報恩", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr14", name: "社會調查", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr15", name: "情報售貨機", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr16", name: "神秘郵件", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr17", name: "心意無價", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr18", name: "雨中抉擇", char: "Rafayel", type: "encounter", status: false },
-        { id: "tr19", name: "落跑塗鴉", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr20", name: "破壁之行", char: "Rafayel", type: "encounter", status: true },
-        { id: "tr21", name: "咖啡甜酒", char: "Rafayel", type: "encounter", status: false },
+            // 祁煜 Rafayel
+            { id: "tr1", name: "閃耀噴泉－１", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr2", name: "閃耀噴泉－２", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr3", name: "愛與戲－１", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr4", name: "愛與戲－２", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr5", name: "奇怪攤販－１", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr6", name: "奇怪攤販－２", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr7", name: "良石難尋", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr8", name: "香氣襲人", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr9", name: "路遇推銷", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr10", name: "逃離城堡", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr11", name: "黑暗料理", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr12", name: "絕版周邊", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr13", name: "小鳥的報恩", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr14", name: "社會調查", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr15", name: "情報售貨機", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr16", name: "神秘郵件", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr17", name: "心意無價", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr18", name: "雨中抉擇", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "tr19", name: "落跑塗鴉", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr20", name: "破壁之行", char: "Rafayel", chap: "tumeng", type: "encounter", status: true },
+            { id: "tr21", name: "咖啡甜酒", char: "Rafayel", chap: "tumeng", type: "encounter", status: false },
+            { id: "fr1", name: "➊ 海洋的新生－１", char: "Rafayel", chap: "farewell", type: "crisis", status: true },
+            { id: "fr2", name: "➋ 海洋的新生－２", char: "Rafayel", chap: "farewell", type: "crisis", status: false },
+            { id: "fr3", name: "➊ 老舊販賣機－１", char: "Rafayel", chap: "farewell", type: "crisis", status: true },
+            { id: "fr4", name: "➋ 老舊販賣機－２", char: "Rafayel", chap: "farewell", type: "crisis", status: true },
+            { id: "fr5", name: "➊ 自助購物－１", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr6", name: "➋ 自助購物－２", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr7", name: "要錢不要命", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr8", name: "垃圾分類", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr9", name: "故障機器人", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr10", name: "百靈鳥之舌", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr11", name: "塔羅牌扮演", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr12", name: "神秘郵件 2.0", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr13", name: "敬相遇", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr14", name: "玻璃渣", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr15", name: "香氛氣泡彈", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr16", name: "紙箱演奏家", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr17", name: "閃耀燈球", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr18", name: "開業大酬賓", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr19", name: "進退兩難", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr20", name: "暗道往事", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr21", name: "異變", char: "Rafayel", chap: "farewell", type: "crisis", status: true },
+            { id: "fr22", name: "療養機器人", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr23", name: "電子路障", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr24", name: "受傷的研究員", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr25", name: "牆壁中的＂神靈＂", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr26", name: "許願池的＂神靈＂", char: "Rafayel", chap: "farewell", type: "encounter", status: false },
+            { id: "fr27", name: "倖存者", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr28", name: "意外社交", char: "Rafayel", chap: "farewell", type: "encounter", status: true },
+            { id: "fr29", name: "被遺棄的置物箱", char: "Rafayel", chap: "farewell", type: "encounter", status: false },
 
-        /* 秦徹 Sylus */
-        { id: "ts1", name: "深洞之下－１", char: "Sylus", type: "encounter", status: true },
-        { id: "ts2", name: "深洞之下－２", char: "Sylus", type: "encounter", status: true },
-        { id: "ts3", name: "火辣冰涼－１", char: "Sylus", type: "encounter", status: true },
-        { id: "ts4", name: "火辣冰涼－２", char: "Sylus", type: "encounter", status: true },
-        { id: "ts5", name: "角色扮演－１", char: "Sylus", type: "encounter", status: true },
-        { id: "ts6", name: "角色扮演－２", char: "Sylus", type: "encounter", status: true },
-        { id: "ts7", name: "鬥蟲大賽", char: "Sylus", type: "encounter", status: true },
-        { id: "ts8", name: "善意為餌", char: "Sylus", type: "encounter", status: true },
-        { id: "ts9", name: "跳蚤市場", char: "Sylus", type: "encounter", status: true },
-        { id: "ts10", name: "魔幻奇旅", char: "Sylus", type: "encounter", status: true },
-        { id: "ts11", name: "半路槍聲", char: "Sylus", type: "encounter", status: true },
-        { id: "ts12", name: "活動進行時", char: "Sylus", type: "encounter", status: true },
-        { id: "ts13", name: "河與漁", char: "Sylus", type: "encounter", status: true },
-        { id: "ts14", name: "各取所需", char: "Sylus", type: "encounter", status: true },
-        { id: "ts15", name: "情報售貨機", char: "Sylus", type: "encounter", status: true },
-        { id: "ts16", name: "神秘郵件", char: "Sylus", type: "encounter", status: true },
-        { id: "ts17", name: "心意無價", char: "Sylus", type: "encounter", status: true },
-        { id: "ts18", name: "雨中抉擇", char: "Sylus", type: "encounter", status: true },
-        { id: "ts19", name: "落跑塗鴉", char: "Sylus", type: "encounter", status: true },
-        { id: "ts20", name: "破壁之行", char: "Sylus", type: "encounter", status: true },
-        { id: "ts21", name: "咖啡甜酒", char: "Sylus", type: "encounter", status: true }
-    ],
+            // 秦徹 Sylus
+            { id: "ts1", name: "深洞之下－１", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts2", name: "深洞之下－２", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts3", name: "火辣冰涼－１", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts4", name: "火辣冰涼－２", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts5", name: "角色扮演－１", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts6", name: "角色扮演－２", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts7", name: "鬥蟲大賽", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts8", name: "善意為餌", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts9", name: "跳蚤市場", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts10", name: "魔幻奇旅", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts11", name: "半路槍聲", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts12", name: "活動進行時", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts13", name: "河與漁", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts14", name: "各取所需", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts15", name: "情報售貨機", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts16", name: "神秘郵件", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts17", name: "心意無價", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts18", name: "雨中抉擇", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts19", name: "落跑塗鴉", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts20", name: "破壁之行", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "ts21", name: "咖啡甜酒", char: "Sylus", chap: "tumeng", type: "encounter", status: true },
+            { id: "fs1", name: "➊ 詛咒盒－１", char: "Sylus", chap: "farewell", type: "crisis", status: true },
+            { id: "fs2", name: "➋ 詛咒盒－２", char: "Sylus", chap: "farewell", type: "crisis", status: true },
+            { id: "fs3", name: "➊ 老舊販賣機－１", char: "Sylus", chap: "farewell", type: "crisis", status: true },
+            { id: "fs4", name: "➋ 老舊販賣機－２", char: "Sylus", chap: "farewell", type: "crisis", status: true },
+            { id: "fs5", name: "➊ 自助購物－１", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs6", name: "➋ 自助購物－２", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs7", name: "要錢不要命", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs8", name: "垃圾分類", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs9", name: "故障機器人", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs10", name: "欲望之書", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs11", name: "塔羅牌扮演", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs12", name: "神秘郵件 2.0", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs13", name: "敬相遇", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs14", name: "遺落的手槍", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs15", name: "卡拉ｏｋ機", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs16", name: "紙箱演奏家", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs17", name: "閃耀燈球", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs18", name: "開業大酬賓", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs19", name: "進退兩難", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs20", name: "暗道往事", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs21", name: "異變", char: "Sylus", chap: "farewell", type: "crisis", status: true },
+            { id: "fs22", name: "療養機器人", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs23", name: "電子路障", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs24", name: "受傷的研究員", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs25", name: "牆壁中的＂神靈＂", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs26", name: "許願池的＂神靈＂", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs27", name: "倖存者", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs28", name: "意外社交", char: "Sylus", chap: "farewell", type: "encounter", status: true },
+            { id: "fs29", name: "被遺棄的置物箱", char: "Sylus", chap: "farewell", type: "encounter", status: true },
 
-    // 混沌深網：最後的告別
-    farewell: [
-        /* 沈星回 Xavier */
-        { id: "fx1", name: "➊ 老電影－１", char: "Xavier", type: "crisis", status: true },
-        { id: "fx2", name: "➋ 老電影－２", char: "Xavier", type: "crisis", status: true },
-        { id: "fx3", name: "➊ 老舊販賣機－１", char: "Xavier", type: "crisis", status: true },
-        { id: "fx4", name: "➋ 老舊販賣機－２", char: "Xavier", type: "crisis", status: true },
-        { id: "fx5", name: "➊ 自助購物－１", char: "Xavier", type: "encounter", status: true },
-        { id: "fx6", name: "➋ 自助購物－２", char: "Xavier", type: "encounter", status: true },
-        { id: "fx7", name: "要錢不要命", char: "Xavier", type: "encounter", status: true },
-        { id: "fx8", name: "垃圾分類", char: "Xavier", type: "encounter", status: true },
-        { id: "fx9", name: "故障機器人", char: "Xavier", type: "encounter", status: true },
-        { id: "fx10", name: "ＭＰ３", char: "Xavier", type: "encounter", status: true },
-        { id: "fx11", name: "塔羅牌扮演", char: "Xavier", type: "encounter", status: true },
-        { id: "fx12", name: "神秘郵件 2.0", char: "Xavier", type: "encounter", status: true },
-        { id: "fx13", name: "敬相遇", char: "Xavier", type: "encounter", status: true },
-        { id: "fx14", name: "黯然的燈光", char: "Xavier", type: "encounter", status: true },
-        { id: "fx15", name: "畫家園模擬器", char: "Xavier", type: "encounter", status: true },
-        { id: "fx16", name: "紙箱演奏家", char: "Xavier", type: "encounter", status: true },
-        { id: "fx17", name: "閃耀燈球", char: "Xavier", type: "encounter", status: true },
-        { id: "fx18", name: "開業大酬賓", char: "Xavier", type: "encounter", status: true },
-        { id: "fx19", name: "進退兩難", char: "Xavier", type: "encounter", status: true },
-        { id: "fx20", name: "暗道往事", char: "Xavier", type: "encounter", status: true },
-        { id: "fx21", name: "異變", char: "Xavier", type: "crisis", status: true },
-        { id: "fx22", name: "療養機器人", char: "Xavier", type: "encounter", status: true },
-        { id: "fx23", name: "電子路障", char: "Xavier", type: "encounter", status: true },
-        { id: "fx24", name: "受傷的研究員", char: "Xavier", type: "encounter", status: true },
-        { id: "fx25", name: "牆壁中的＂神靈＂", char: "Xavier", type: "encounter", status: true },
-        { id: "fx26", name: "許願池的＂神靈＂", char: "Xavier", type: "encounter", status: true },
-        { id: "fx27", name: "倖存者", char: "Xavier", type: "encounter", status: true },
-        { id: "fx28", name: "意外社交", char: "Xavier", type: "encounter", status: true },
-        { id: "fx29", name: "被遺棄的置物箱", char: "Xavier", type: "encounter", status: true },
+            // 夏以晝 Caleb
+            { id: "tc1", name: "數據亂流", char: "Caleb", chap: "tumeng", type: "encounter", status: true },
+            { id: "fc1", name: "➊ 黑洞的誕生－１", char: "Caleb", chap: "farewell", type: "crisis", status: true },
+            { id: "fc2", name: "➋ 黑洞的誕生－２", char: "Caleb", chap: "farewell", type: "crisis", status: false },
+            { id: "fc3", name: "➊ 老舊販賣機－１", char: "Caleb", chap: "farewell", type: "crisis", status: true },
+            { id: "fc4", name: "➋ 老舊販賣機－２", char: "Caleb", chap: "farewell", type: "crisis", status: true },
+            { id: "fc5", name: "➊ 自助購物－１", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc6", name: "➋ 自助購物－２", char: "Caleb", chap: "farewell", type: "encounter", status: false },
+            { id: "fc7", name: "要錢不要命", char: "Caleb", chap: "farewell", type: "encounter", status: false },
+            { id: "fc8", name: "垃圾分類", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc9", name: "故障機器人", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc10", name: "飛行表演", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc11", name: "塔羅牌扮演", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc12", name: "神秘郵件 2.0", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc13", name: "敬相遇", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc14", name: "灌籃高手", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc15", name: "極限大挑戰", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc16", name: "紙箱演奏家", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc17", name: "閃耀燈球", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc18", name: "開業大酬賓", char: "Caleb", chap: "farewell", type: "encounter", status: false },
+            { id: "fc19", name: "進退兩難", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc20", name: "暗道往事", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc21", name: "異變", char: "Caleb", chap: "farewell", type: "crisis", status: true },
+            { id: "fc22", name: "療養機器人", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc23", name: "電子路障", char: "Caleb", chap: "farewell", type: "encounter", status: false },
+            { id: "fc24", name: "受傷的研究員", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc25", name: "牆壁中的＂神靈＂", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc26", name: "許願池的＂神靈＂", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc27", name: "倖存者", char: "Caleb", chap: "farewell", type: "encounter", status: true },
+            { id: "fc28", name: "意外社交", char: "Caleb", chap: "farewell", type: "encounter", status: false },
+            { id: "fc29", name: "被遺棄的置物箱", char: "Caleb", chap: "farewell", type: "encounter", status: true }
+        ];
 
-        /* 黎深 Zayne */
-        { id: "fz1", name: "➊ 命運迴響－１", char: "Zayne", type: "crisis", status: true },
-        { id: "fz2", name: "➋ 命運迴響－２", char: "Zayne", type: "crisis", status: true },
-        { id: "fz3", name: "➊ 老舊販賣機－１", char: "Zayne", type: "crisis", status: true },
-        { id: "fz4", name: "➋ 老舊販賣機－２", char: "Zayne", type: "crisis", status: true },
-        { id: "fz5", name: "➊ 自助購物－１", char: "Zayne", type: "encounter", status: true },
-        { id: "fz6", name: "➋ 自助購物－２", char: "Zayne", type: "encounter", status: true },
-        { id: "fz7", name: "要錢不要命", char: "Zayne", type: "encounter", status: true },
-        { id: "fz8", name: "垃圾分類", char: "Zayne", type: "encounter", status: true },
-        { id: "fz9", name: "故障機器人", char: "Zayne", type: "encounter", status: true },
-        { id: "fz10", name: "集換零食包", char: "Zayne", type: "encounter", status: true },
-        { id: "fz11", name: "塔羅牌扮演", char: "Zayne", type: "encounter", status: true },
-        { id: "fz12", name: "神秘郵件 2.0", char: "Zayne", type: "encounter", status: true },
-        { id: "fz13", name: "敬相遇", char: "Zayne", type: "encounter", status: true },
-        { id: "fz14", name: "雪落時靠近", char: "Zayne", type: "encounter", status: true },
-        { id: "fz15", name: "獨家甜品站", char: "Zayne", type: "encounter", status: true },
-        { id: "fz16", name: "紙箱演奏家", char: "Zayne", type: "encounter", status: true },
-        { id: "fz17", name: "閃耀燈球", char: "Zayne", type: "encounter", status: true },
-        { id: "fz18", name: "開業大酬賓", char: "Zayne", type: "encounter", status: true },
-        { id: "fz19", name: "進退兩難", char: "Zayne", type: "encounter", status: true },
-        { id: "fz20", name: "暗道往事", char: "Zayne", type: "encounter", status: true },
-        { id: "fz21", name: "異變", char: "Zayne", type: "crisis", status: true },
-        { id: "fz22", name: "療養機器人", char: "Zayne", type: "encounter", status: true },
-        { id: "fz23", name: "電子路障", char: "Zayne", type: "encounter", status: true },
-        { id: "fz24", name: "受傷的研究員", char: "Zayne", type: "encounter", status: true },
-        { id: "fz25", name: "牆壁中的＂神靈＂", char: "Zayne", type: "encounter", status: true },
-        { id: "fz26", name: "許願池的＂神靈＂", char: "Zayne", type: "encounter", status: true },
-        { id: "fz27", name: "倖存者", char: "Zayne", type: "encounter", status: true },
-        { id: "fz28", name: "意外社交", char: "Zayne", type: "encounter", status: true },
-        { id: "fz29", name: "被遺棄的置物箱", char: "Zayne", type: "encounter", status: true },
+        // 渲染函數
+        function render() {
+            const container = document.getElementById('card-container');
+            container.innerHTML = ''; // 清空
 
-        /* 祁煜 Rafayel */
-        { id: "fr1", name: "➊ 海洋的新生－１", char: "Rafayel", type: "crisis", status: true },
-        { id: "fr2", name: "➋ 海洋的新生－２", char: "Rafayel", type: "crisis", status: false },
-        { id: "fr3", name: "➊ 老舊販賣機－１", char: "Rafayel", type: "crisis", status: true },
-        { id: "fr4", name: "➋ 老舊販賣機－２", char: "Rafayel", type: "crisis", status: true },
-        { id: "fr5", name: "➊ 自助購物－１", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr6", name: "➋ 自助購物－２", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr7", name: "要錢不要命", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr8", name: "垃圾分類", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr9", name: "故障機器人", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr10", name: "百靈鳥之舌", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr11", name: "塔羅牌扮演", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr12", name: "神秘郵件 2.0", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr13", name: "敬相遇", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr14", name: "玻璃渣", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr15", name: "香氛氣泡彈", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr16", name: "紙箱演奏家", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr17", name: "閃耀燈球", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr18", name: "開業大酬賓", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr19", name: "進退兩難", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr20", name: "暗道往事", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr21", name: "異變", char: "Rafayel", type: "crisis", status: true },
-        { id: "fr22", name: "療養機器人", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr23", name: "電子路障", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr24", name: "受傷的研究員", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr25", name: "牆壁中的＂神靈＂", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr26", name: "許願池的＂神靈＂", char: "Rafayel", type: "encounter", status: false },
-        { id: "fr27", name: "倖存者", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr28", name: "意外社交", char: "Rafayel", type: "encounter", status: true },
-        { id: "fr29", name: "被遺棄的置物箱", char: "Rafayel", type: "encounter", status: false },
+            // 過濾資料
+            const filteredData = gameData.filter(item => {
+                const charMatch = (currentChar === 'All' || item.char === currentChar);
+                const chapMatch = (currentChap === 'All' || item.chap === currentChap);
+                return charMatch && chapMatch;
+            });
 
-        /* 秦徹 Sylus */
-        { id: "fs1", name: "➊ 詛咒盒－１", char: "Sylus", type: "crisis", status: true },
-        { id: "fs2", name: "➋ 詛咒盒－２", char: "Sylus", type: "crisis", status: true },
-        { id: "fs3", name: "➊ 老舊販賣機－１", char: "Sylus", type: "crisis", status: true },
-        { id: "fs4", name: "➋ 老舊販賣機－２", char: "Sylus", type: "crisis", status: true },
-        { id: "fs5", name: "➊ 自助購物－１", char: "Sylus", type: "encounter", status: true },
-        { id: "fs6", name: "➋ 自助購物－２", char: "Sylus", type: "encounter", status: true },
-        { id: "fs7", name: "要錢不要命", char: "Sylus", type: "encounter", status: true },
-        { id: "fs8", name: "垃圾分類", char: "Sylus", type: "encounter", status: true },
-        { id: "fs9", name: "故障機器人", char: "Sylus", type: "encounter", status: true },
-        { id: "fs10", name: "欲望之書", char: "Sylus", type: "encounter", status: true },
-        { id: "fs11", name: "塔羅牌扮演", char: "Sylus", type: "encounter", status: true },
-        { id: "fs12", name: "神秘郵件 2.0", char: "Sylus", type: "encounter", status: true },
-        { id: "fs13", name: "敬相遇", char: "Sylus", type: "encounter", status: true },
-        { id: "fs14", name: "遺落的手槍", char: "Sylus", type: "encounter", status: true },
-        { id: "fs15", name: "卡拉ｏｋ機", char: "Sylus", type: "encounter", status: true },
-        { id: "fs16", name: "紙箱演奏家", char: "Sylus", type: "encounter", status: true },
-        { id: "fs17", name: "閃耀燈球", char: "Sylus", type: "encounter", status: true },
-        { id: "fs18", name: "開業大酬賓", char: "Sylus", type: "encounter", status: true },
-        { id: "fs19", name: "進退兩難", char: "Sylus", type: "encounter", status: true },
-        { id: "fs20", name: "暗道往事", char: "Sylus", type: "encounter", status: true },
-        { id: "fs21", name: "異變", char: "Sylus", type: "crisis", status: true },
-        { id: "fs22", name: "療養機器人", char: "Sylus", type: "encounter", status: true },
-        { id: "fs23", name: "電子路障", char: "Sylus", type: "encounter", status: true },
-        { id: "fs24", name: "受傷的研究員", char: "Sylus", type: "encounter", status: true },
-        { id: "fs25", name: "牆壁中的＂神靈＂", char: "Sylus", type: "encounter", status: true },
-        { id: "fs26", name: "許願池的＂神靈＂", char: "Sylus", type: "encounter", status: true },
-        { id: "fs27", name: "倖存者", char: "Sylus", type: "encounter", status: true },
-        { id: "fs28", name: "意外社交", char: "Sylus", type: "encounter", status: true },
-        { id: "fs29", name: "被遺棄的置物箱", char: "Sylus", type: "encounter", status: true },
+            // 繪製卡片
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                const isChecked = item.status ? 'checked' : '';
+                const chapName = item.chap === 'tumeng' ? '尋找圖蒙' : '最後的告別';
+                const badgeClass = item.type === 'crisis' ? 'type-crisis' : 'type-encounter';
+                const badgeText = item.type === 'crisis' ? '偶發危機' : '偶發遭遇';
 
-        /* 夏以晝 Caleb */
-        { id: "fc1", name: "➊ 黑洞的誕生－１", char: "Caleb", type: "crisis", status: true },
-        { id: "fc2", name: "➋ 黑洞的誕生－２", char: "Caleb", type: "crisis", status: false },
-        { id: "fc3", name: "➊ 老舊販賣機－１", char: "Caleb", type: "crisis", status: true },
-        { id: "fc4", name: "➋ 老舊販賣機－２", char: "Caleb", type: "crisis", status: true },
-        { id: "fc5", name: "➊ 自助購物－１", char: "Caleb", type: "encounter", status: true },
-        { id: "fc6", name: "➋ 自助購物－２", char: "Caleb", type: "encounter", status: false },
-        { id: "fc7", name: "要錢不要命", char: "Caleb", type: "encounter", status: false },
-        { id: "fc8", name: "垃圾分類", char: "Caleb", type: "encounter", status: true },
-        { id: "fc9", name: "故障機器人", char: "Caleb", type: "encounter", status: true },
-        { id: "fc10", name: "飛行表演", char: "Caleb", type: "encounter", status: true },
-        { id: "fc11", name: "塔羅牌扮演", char: "Caleb", type: "encounter", status: true },
-        { id: "fc12", name: "神秘郵件 2.0", char: "Caleb", type: "encounter", status: true },
-        { id: "fc13", name: "敬相遇", char: "Caleb", type: "encounter", status: true },
-        { id: "fc14", name: "灌籃高手", char: "Caleb", type: "encounter", status: true },
-        { id: "fc15", name: "極限大挑戰", char: "Caleb", type: "encounter", status: true },
-        { id: "fc16", name: "紙箱演奏家", char: "Caleb", type: "encounter", status: true },
-        { id: "fc17", name: "閃耀燈球", char: "Caleb", type: "encounter", status: true },
-        { id: "fc18", name: "開業大酬賓", char: "Caleb", type: "encounter", status: false },
-        { id: "fc19", name: "進退兩難", char: "Caleb", type: "encounter", status: true },
-        { id: "fc20", name: "暗道往事", char: "Caleb", type: "encounter", status: true },
-        { id: "fc21", name: "異變", char: "Caleb", type: "crisis", status: true },
-        { id: "fc22", name: "療養機器人", char: "Caleb", type: "encounter", status: true },
-        { id: "fc23", name: "電子路障", char: "Caleb", type: "encounter", status: false },
-        { id: "fc24", name: "受傷的研究員", char: "Caleb", type: "encounter", status: true },
-        { id: "fc25", name: "牆壁中的＂神靈＂", char: "Caleb", type: "encounter", status: true },
-        { id: "fc26", name: "許願池的＂神靈＂", char: "Caleb", type: "encounter", status: true },
-        { id: "fc27", name: "倖存者", char: "Caleb", type: "encounter", status: true },
-        { id: "fc28", name: "意外社交", char: "Caleb", type: "encounter", status: false },
-        { id: "fc29", name: "被遺棄的置物箱", char: "Caleb", type: "encounter", status: true }
-    ],
+                card.innerHTML = `
+                    <span class="chap-tag">[ ${chapName} ]</span>
+                    <span class="badge ${badgeClass}">${badgeText}</span>
+                    <div class="item-name">${item.name}</div>
+                    <div style="font-size: 0.8rem; color: #8b949e; margin-bottom: 10px;">角色: ${item.char}</div>
+                    <label style="cursor:pointer">
+                        <input type="checkbox" ${isChecked} onchange="updateStatus('${item.id}', this.checked)"> 已達成
+                    </label>
+                `;
+                container.appendChild(card);
+            });
 
-    // 代碼圖鑑 (從 Excel 擷取部分代碼作為範例)
-    codes: [
-        { id: "c1", name: "捆綁運行", char: "All", type: "encounter", status: true },
-        { id: "c2", name: "惡意訪問", char: "All", type: "encounter", status: true },
-        { id: "c3", name: "協同部署", char: "All", type: "encounter", status: true },
-        { id: "c4", name: "篡改線路", char: "All", type: "encounter", status: true },
-        { id: "c5", name: "運行崩潰", char: "All", type: "encounter", status: true },
-        { id: "c6", name: "自我銷毀", char: "All", type: "encounter", status: true },
-        { id: "c7", name: "沙箱測試", char: "All", type: "encounter", status: true },
-        { id: "c8", name: "離散變數", char: "All", type: "encounter", status: true },
-        { id: "c9", name: "過量加載", char: "All", type: "encounter", status: true },
-        { id: "c10", name: "能量最佳化", char: "All", type: "encounter", status: true }
-    ]
-};
+            // 更新統計
+            updateProgress(filteredData);
+        }
 
-
-        // --- 新增：更新進度條函式 ---
-        function updateProgress(filteredData) {
-            const total = filteredData.length;
-            const completed = filteredData.filter(item => item.status === true).length;
+        // 修改後的進度條更新 (動態計算當前組合的基數)
+        function updateProgress(list) {
+            const total = list.length;
+            const completed = list.filter(i => i.status).length;
             const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
             document.getElementById('total-count').innerText = total;
@@ -488,66 +426,37 @@
             document.getElementById('progress-fill').style.width = percent + '%';
         }
 
-        // 核心渲染函式
-        function renderCards(category, charFilter = 'All') {
-            const container = document.getElementById('card-container');
-            container.innerHTML = '';
-            
-            const data = gameData[category] || [];
-            const filteredData = charFilter === 'All' ? data : data.filter(item => item.char === charFilter);
-
-            filteredData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'event-card';
-                
-                const isChecked = item.status === true ? 'checked' : '';
-                const badgeClass = item.type === 'crisis' ? 'type-crisis' : 'type-encounter';
-                const badgeText = item.type === 'crisis' ? '偶發危機' : '偶發遭遇';
-
-                card.innerHTML = `
-                    <span class="badge ${badgeClass}">${badgeText}</span>
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-status">角色: ${item.char}</div>
-                    <label style="cursor:pointer">
-                        <input type="checkbox" ${isChecked} onchange="toggleSave('${item.id}', this.checked)">
-                        已達成
-                    </label>
-                `;
-                container.appendChild(card);
-            });
-
-            // 每次渲染時自動更新進度條
-            updateProgress(filteredData);
-        }
-
-        function showPage(category) {
-            currentCategory = category;
-            const titles = { tumeng: '尋找圖蒙 - 偶發事件', farewell: '最後的告別 - 偶發事件', codes: '混沌深網代碼圖鑑' };
-            document.getElementById('page-title').innerText = titles[category] || '深空紀錄';
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const activeNav = document.getElementById('nav-' + category);
-            if(activeNav) activeNav.classList.add('active');
-
-            // 切換頁面時預設顯示「全部」，並渲染
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-all').classList.add('active');
-            
-            renderCards(category);
-        }
-
-        function filterByChar(char, btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        // 角色篩選切換
+        function setChar(char, btn) {
+            document.querySelectorAll('#char-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            renderCards(currentCategory, char);
+            currentChar = char;
+            render();
         }
 
-        function toggleSave(id, checked) {
-            console.log(`事件ID: ${id} 狀態變更為: ${checked}`);
-            // 注意：這裡目前僅在控制台顯示。若要永久保存，需要更新 gameData 並存入 localStorage
+        // 章節篩選切換
+        function setChap(chap, btn) {
+            document.querySelectorAll('#chap-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentChap = chap;
+            render();
         }
 
-        window.onload = () => showPage('tumeng');
+        // 即時狀態更新
+        function updateStatus(id, checked) {
+            const item = gameData.find(i => i.id === id);
+            if (item) item.status = checked;
+
+            // 重新計算目前畫面上該組資料的進度
+            const currentFiltered = gameData.filter(i => {
+                const charMatch = (currentChar === 'All' || i.char === currentChar);
+                const chapMatch = (currentChap === 'All' || i.chap === currentChap);
+                return charMatch && chapMatch;
+            });
+            updateProgress(currentFiltered);
+        }
+
+        window.onload = render;
     </script>
 </body>
 </html>
